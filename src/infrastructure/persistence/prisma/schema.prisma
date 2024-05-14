@@ -1,0 +1,47 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Management {
+  id                 String    @id @default(uuid())
+  name               String    @unique
+  representativeName String?
+  description        String?
+  createdBy          String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  services           Service[]
+
+  @@map("managements")
+}
+
+model Service {
+  id               String             @id @default(uuid())
+  name             String             @unique
+  description      String?
+  createdBy        String?
+  management       Management         @relation(fields: [managementId], references: [id], onDelete: Cascade)
+  managementId     String
+  ServiceOnContact ServiceOnContact[]
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@map("services")
+}
+
+model ServiceOnContact {
+  id        String   @id @default(uuid())
+  service   Service  @relation(fields: [serviceId], references: [id])
+  serviceId String
+  contactId String
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("services_on_contacts")
+}
